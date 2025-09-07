@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Beautiful Marketplace</title>
+<style>
+  body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; background:#f5f5f5; color:#333; }
+  h1 { text-align:center; color:#ff6f61; margin-top:20px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; padding:20px; }
+  .card { background:#fff; padding:15px; border-radius:15px; text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.1); transition:0.3s; }
+  .card:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
+  .card img { width:100%; height:180px; object-fit:cover; border-radius:12px; transition:0.3s; }
+  .card img:hover { transform:scale(1.05); }
+  .price { color:#ff6f61; font-weight:bold; margin-top:5px; }
+  .btn { background:#ff6f61; color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer; margin-top:10px; font-weight:bold; }
+  .btn:hover { background:#ff5a4d; }
+  .cart { position:fixed; right:0; top:0; width:280px; height:100%; background:#fff; padding:20px; overflow:auto; display:none; box-shadow:-5px 0 15px rgba(0,0,0,0.1); border-left:1px solid #ddd; }
+  .cart.active { display:block; }
+  .cart-item { display:flex; align-items:center; margin-bottom:12px; }
+  .cart-item img { width:50px; height:50px; margin-right:10px; border-radius:8px; object-fit:cover; }
+  #toggleCart { position:fixed; top:20px; right:20px; z-index:1000; background:#ff6f61; }
+</style>
+</head>
+<body>
+<h1>Beautiful Marketplace</h1>
+<button id="toggleCart" class="btn">View Cart</button>
+<div class="grid" id="productGrid"></div>
+<div class="cart" id="cart">
+  <h3>Your Cart</h3>
+  <div id="cartItems"></div>
+  <div id="cartTotal" style="margin-top:10px; font-weight:bold; color:#ff6f61;"></div>
+</div>
+<script>
+let products = [];
+let cart = [];
+const productGrid = document.getElementById("productGrid");
+const cartDiv = document.getElementById("cart");
+const cartItemsDiv = document.getElementById("cartItems");
+const cartTotalDiv = document.getElementById("cartTotal");
+
+// Fetch products from Fake Store API
+async function fetchProducts() {
+  try {
+    const res = await fetch('https://fakestoreapi.com/products');
+    products = await res.json();
+    renderProducts();
+  } catch (err) {
+    console.error("Failed to fetch products:", err);
+    productGrid.innerHTML = "<p>Failed to load products. Try again later.</p>";
+  }
+}
+
+function renderProducts() {
+  productGrid.innerHTML = "";
+  products.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src='${p.image}' alt='${p.title}'/>
+      <h3>${p.title}</h3>
+      <div class='price'>$${p.price}</div>
+      <button class='btn'>Add to Cart</button>
+    `;
+    card.querySelector('button').addEventListener('click', () => addToCart(p));
+    productGrid.appendChild(card);
+  });
+}
+
+function addToCart(item) {
+  cart.push(item);
+  renderCart();
+}
+
+function renderCart() {
+  cartItemsDiv.innerHTML = "";
+  let total = 0;
+  cart.forEach(c => {
+    total += c.price;
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `<img src='${c.image}' alt='${c.title}'/><span>${c.title} - $${c.price}</span>`;
+    cartItemsDiv.appendChild(div);
+  });
+  cartTotalDiv.innerHTML = `Total: $${total.toFixed(2)}`;
+}
+
+document.getElementById('toggleCart').addEventListener('click', () => {
+  cartDiv.classList.toggle('active');
+});
+
+fetchProducts();
+</script>
+</body>
+</html>
