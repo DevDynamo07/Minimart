@@ -25,6 +25,8 @@ This project fetches product data from a **live API** and simulates basic shoppi
 - **Public API** (for product data)
 
 ---
+## Deployed Application
 
+You can view the live version of this project here: https://minimart-gamma.vercel.app/
 
 
